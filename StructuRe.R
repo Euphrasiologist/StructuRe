@@ -49,10 +49,11 @@ parseStructure <- function(file, matrix = FALSE){
 #' @param x R object that inherits PStructure (parsed STRUCTURE).
 #' @param pop_names optional; supply a vector of population names.
 #' @param col optional; group colours. Default is greyscale.
+#' @param yAdjust optional; adjust the y position of x axis labels.
 #' @keywords STRUCTURE, parse, plot
 #' @export
 
-plot.PStructure <- function(x, pop_names = NULL, col = NULL){
+plot.PStructure <- function(x, pop_names = NULL, col = NULL, yAdjust = -0.03){
   
   if(!is.null(pop_names) & length(pop_names) != attributes(x)$k) stop("Population names does not equal k.")
   if(!is.null(col) & length(col) != attributes(x)$k) stop("Colour vector must be same length as number of populations.")
@@ -81,9 +82,9 @@ plot.PStructure <- function(x, pop_names = NULL, col = NULL){
     i <- 1
     for(text in text_add){
       if(!is.null(pop_names)){
-        text(x = text, y=-0.03, label = pop_names[i], font=3)
+        text(x = text, y = yAdjust, label = pop_names[i], font=3)
       } else if(is.null(pop_names)){
-        text(x = text, y=-0.03, label = paste("Pop", i, sep = "-"), font=3) 
+        text(x = text, y = yAdjust, label = paste("Pop", i, sep = "-"), font=3) 
       }
       i <- i + 1
     }
