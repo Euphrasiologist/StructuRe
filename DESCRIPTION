@@ -1,0 +1,11 @@
+Package: StructuRe
+Title: Parse and plot STRUCTURE file output
+Date: 2020-17-06
+Version: 0.1.0
+Authors@R: person("Max", "Brown", email = "max.brown@ed.ac.uk", role = c("aut", "cre"))
+Description: Tiny package to parse and plot STRUCTURE file output, using base R.
+Depends: R(>= 3.5.1)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2
