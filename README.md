@@ -10,7 +10,7 @@ Simply install using devtools (`install.packages("devtools");library(devtools)`)
 `devtools::install_github("Euphrasiologist/StructuRe")`
 
 First, parse the data: `parsed_struct <- parseStructure("/path/to/file/")`\
-Then, plot the data: `plot(parsed_struct)`\
+Then, plot the data: `plot(parsed_struct)`
 
 ### Acknowledgements
 
