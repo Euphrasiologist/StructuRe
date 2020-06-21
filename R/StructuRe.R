@@ -38,6 +38,13 @@ parseStructure <- function(file, matrix = FALSE){
   col_IC <- paste("IC", 1:n_IC, sep = "_")
   
   colnames(dat) <- c("ID", "Missing", "Group", col_IC)
+  
+  if(identical(ass, group)){
+    warning("No Pop data in initial input")
+    grp <- match("Group", colnames(dat))
+    dat <- dat[,-grp]
+  }
+  
   class(dat) <- c("PStructure", "data.frame")
   attr(dat, "k") <- k
   
@@ -53,25 +60,50 @@ parseStructure <- function(file, matrix = FALSE){
 #' @keywords STRUCTURE, parse, plot
 #' @export
 
-plot.PStructure <- function(x, pop_names = NULL, col = NULL, yAdjust = -0.03){
-  
-  if(!is.null(pop_names) & length(pop_names) != attributes(x)$k) stop("Population names does not equal k.")
-  if(!is.null(col) & length(col) != attributes(x)$k) stop("Colour vector must be same length as number of populations.")
+plot.PStructure <- function(x, 
+                            pop_names = NULL, 
+                            col = NULL, 
+                            yadjust = -0.03, 
+                            pattern = "(^.{1}).*",
+                            order = "byname"){
+  # fixme
+  if(!is.null(pop_names) & !length(pop_names) %in% c(0, attributes(x)$k)) stop("Population names does not equal k.")
+  if(!is.null(col) & !length(col) %in% c(0, attributes(x)$k)) stop("Colour vector must be same length as number of populations.")
+  if(!is.character(order) & !order %in% c("byname", "byq", "none")) stop("Order must be one of byname, byq, or none.")
   
   if(is.matrix(x)){
     barplot(x)
   } else {
-    pmat <- t(x[grepl("IC", colnames(x))])
-    colnames(pmat) <- paste(x$Group, x$ID, sep = "-")
-    o_pmat <- pmat[,order(colnames(pmat))]
-    # get groups
-    groups <- table(sapply(strsplit(colnames(o_pmat), "-"), "[[", 1))
+    pmat <- t(struct2[grepl("IC", colnames(struct2))])
+    # fixme
+    colnames(pmat) <- if(!is.null(x$Group)){
+      paste(x$Group, x$ID, sep = "-")
+    } else {
+        x$ID
+    }
+    # order
+    if(order == "byname"){
+      o_pmat <- pmat[,order(colnames(pmat))]
+    } else if(order == "byq"){
+      o_pmat <- pmat[,order(as.numeric(pmat[1,]), colnames(pmat))]
+    } else {
+      o_pmat <- pmat
+    }
+   
+    # get groups. FIXME
+    if(!is.null(x$Group)){
+    groups <- table(sapply(strsplit(colnames(o_pmat), "-"), "[[", 2))
+    } else {
+      ## some regex
+      groups <- table(gsub(pattern = pattern, replacement = "\\1", colnames(o_pmat)))
+    }
     prop_groups <- groups/sum(groups)
     # add plot
     par(xpd=NA)
     if(is.null(col)) barplot(o_pmat, border = 1, space = 0, axes = FALSE, xaxt='n')
     if(!is.null(col)) barplot(o_pmat, border = 1, space = 0, axes = FALSE, xaxt='n', col=col)
     # vector to add text
+    l <- dim(o_pmat)[2]
     lens <- c(0, cumsum(prop_groups)*l)
     lis <- list()
     for(i in 1:length(lens)){
@@ -82,9 +114,9 @@ plot.PStructure <- function(x, pop_names = NULL, col = NULL, yAdjust = -0.03){
     i <- 1
     for(text in text_add){
       if(!is.null(pop_names)){
-        text(x = text, y = yAdjust, label = pop_names[i], font=3)
+        text(x = text, y=yadjust, label = pop_names[i], font=1)
       } else if(is.null(pop_names)){
-        text(x = text, y = yAdjust, label = paste("Pop", i, sep = "-"), font=3) 
+        text(x = text, y=yadjust, label = paste("Pop", i, sep = "-"), font=1) 
       }
       i <- i + 1
     }
@@ -92,3 +124,27 @@ plot.PStructure <- function(x, pop_names = NULL, col = NULL, yAdjust = -0.03){
   }
   
 }
+
+#' Print parsed STRUCTURE output.
+#'
+#' @param x R object that inherits PStructure (parsed STRUCTURE).
+#' @keywords STRUCTURE, print
+#' @export
+
+print.PStructure <- function(x){
+  to_print <- paste("Object of class PStructure with ",
+        attributes(x)$k,
+        " inferred clusters and ",
+        dim(x)[1],
+        " individuals.", sep = "")
+  cat(to_print, "\n\n")
+  no_rows_left <- if(dim(x)[1] > 5){
+    dim(x)[1] - 5
+  } else {
+    NULL
+  }
+  print.data.frame(x[1:5,])
+  to_print2 <- paste("  ...", no_rows_left, " rows truncated", sep = "")
+  cat(to_print2)
+}
+

@@ -4,7 +4,14 @@
 \alias{plot.PStructure}
 \title{Plot parsed STRUCTURE output.}
 \usage{
-\method{plot}{PStructure}(x, pop_names = NULL, col = NULL, yAdjust = -0.03)
+\method{plot}{PStructure}(
+  x,
+  pop_names = NULL,
+  col = NULL,
+  yadjust = -0.03,
+  pattern = "(^.{1}).*",
+  order = "byname"
+)
 }
 \arguments{
 \item{x}{R object that inherits PStructure (parsed STRUCTURE).}
