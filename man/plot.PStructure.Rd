@@ -9,7 +9,7 @@
   pop_names = NULL,
   col = NULL,
   yadjust = -0.03,
-  pattern = "(^.{1}).*",
+  pattern = c("(^.{1}).*", "\\\\1"),
   order = "byname"
 )
 }
@@ -19,6 +19,11 @@
 \item{pop_names}{optional; supply a vector of population names.}
 
 \item{col}{optional; group colours. Default is greyscale.}
+
+\item{pattern}{vector of length 2 describing the pattern and replacement for gsub() on the individual names to define groups.
+the default regex takes the first letter from the vector of ID's.}
+
+\item{order}{string of either byname (order by ID name), byq (order by q value of the first inferred cluster) or none, which orders the bars of the plot.}
 
 \item{yAdjust}{optional; adjust the y position of x axis labels.}
 }

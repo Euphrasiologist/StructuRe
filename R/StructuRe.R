@@ -57,6 +57,9 @@ parseStructure <- function(file, matrix = FALSE){
 #' @param pop_names optional; supply a vector of population names.
 #' @param col optional; group colours. Default is greyscale.
 #' @param yAdjust optional; adjust the y position of x axis labels.
+#' @param pattern vector of length 2 describing the pattern and replacement for gsub() on the individual names to define groups.
+#' the default regex takes the first letter from the vector of ID's.
+#' @param order string of either byname (order by ID name), byq (order by q value of the first inferred cluster) or none, which orders the bars of the plot.
 #' @keywords STRUCTURE, parse, plot
 #' @export
 
@@ -64,7 +67,7 @@ plot.PStructure <- function(x,
                             pop_names = NULL, 
                             col = NULL, 
                             yadjust = -0.03, 
-                            pattern = "(^.{1}).*",
+                            pattern = c("(^.{1}).*", "\\1"),
                             order = "byname"){
   # fixme
   if(!is.null(pop_names) & !length(pop_names) %in% c(0, attributes(x)$k)) stop("Population names does not equal k.")
@@ -95,7 +98,7 @@ plot.PStructure <- function(x,
     groups <- table(sapply(strsplit(colnames(o_pmat), "-"), "[[", 2))
     } else {
       ## some regex
-      groups <- table(gsub(pattern = pattern, replacement = "\\1", colnames(o_pmat)))
+      groups <- table(gsub(pattern = pattern[1], replacement = pattern[2], colnames(o_pmat)))
     }
     prop_groups <- groups/sum(groups)
     # add plot
