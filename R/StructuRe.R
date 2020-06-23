@@ -77,7 +77,7 @@ plot.PStructure <- function(x,
   if(is.matrix(x)){
     barplot(x)
   } else {
-    pmat <- t(struct2[grepl("IC", colnames(struct2))])
+    pmat <- t(x[grepl("IC", colnames(x))])
     # fixme
     colnames(pmat) <- if(!is.null(x$Group)){
       paste(x$Group, x$ID, sep = "-")
